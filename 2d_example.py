@@ -9,12 +9,16 @@ server_s.connect((HOST, PORT))
 #the rectangles position in the middle
 def send_pos(rectobject):
     my_pos = rectobject.get_pos()
+    x = my_pos
+    print(x)
     my_pos = f"{my_pos[0]},{my_pos[1]},{rectobject.z_position}"
+    print(my_pos)
     l = pickle.dumps(f"adp{my_pos}")
     server_s.sendall(l)
     testdata = pickle.loads(server_s.recv(4096))
     testdatatuple = tuple(map(float, testdata.split(",")))
-    if testdatatuple[0] == my_pos[0]:
+    print(testdatatuple,x[0])
+    if testdatatuple[0] == x[0]:
         pass
     else:
         sys.exit()
