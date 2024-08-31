@@ -1,6 +1,18 @@
 from setup import *
 from rectangle import Rectangle
+import pickle
+import socket
+HOST = "127.0.0.1"  # The server's hostname or IP address
+PORT = 9000  # The port used by the server
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
 #the rectangles position in the middle
+def send_pos(rectobject):
+    my_pos = rectobject.get_pos()
+    my_pos = (my_pos[0],my_pos[1],rectobject.z_position)
+    l = pickle.dumps(my_pos)
+    s.sendall(l)
+
 def statue(location=(0,height/2,0)):
     v = location[2]+10
     statue = Rectangle((200,200),(location[0],location[1]+v*-1),(250,0,0),"16_p_tileset.png")
