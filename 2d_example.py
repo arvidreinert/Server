@@ -4,14 +4,20 @@ import pickle
 import socket
 HOST = "127.0.0.1"  # The server's hostname or IP address
 PORT = 9000  # The port used by the server
-server_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_s.connect((HOST, PORT))
 #the rectangles position in the middle
 def send_pos(rectobject):
     my_pos = rectobject.get_pos()
-    my_pos = (my_pos[0],my_pos[1],rectobject.z_position)
-    l = pickle.dumps(my_pos)
+    my_pos = f"{my_pos[0]},{my_pos[1]},{rectobject.z_position}"
+    l = pickle.dumps(f"adp{my_pos}")
     server_s.sendall(l)
+    testdata = pickle.loads(server_s.recv(4096))
+    testdatatuple = tuple(map(float, testdata.split(",")))
+    if testdatatuple[0] == my_pos[0]:
+        pass
+    else:
+        sys.exit()
 
 def get_others_players_pos():
     server_s.sendall(b"get_me_the_others_location")
@@ -277,7 +283,7 @@ while True:
                 my_walk = walk_right
                 pressed = "right"
             elif event.key == pygame.K_SPACE:
-                print(get_others_players_pos())
+                print(send_pos(my_sprites["p"]))
                 if out_of_charakter == True:
                     out_of_charakter = False
                 else:
