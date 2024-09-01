@@ -10,8 +10,10 @@ s.bind((HOST, PORT))
 while True:
     data,addr = s.recvfrom(4096)
     if data == b"get_me_the_others_location":
-        pass
-        #pickle.dumps(players_connected)
+        for address in players_connected:
+            if address != addr:
+                break
+        pickle.dumps(players_connected)
         #s.sendto(players_connected, addr)
 
     elif b"adp" in data:
