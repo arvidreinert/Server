@@ -4,22 +4,18 @@ import pickle
 import socket
 HOST = "127.0.0.1"  # The server's hostname or IP address
 PORT = 9000  # The port used by the server
+PLAYER_RELATIVE_POSITION = [width/2,height/2,0]
 server_s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_s.connect((HOST, PORT))
 #the rectangles position in the middle
-def send_pos(rectobject):
-    my_pos = rectobject.get_pos()
-    x = my_pos
-    print(x)
-    my_pos = f"{my_pos[0]},{my_pos[1]},{rectobject.z_position}"
-    print(my_pos)
+def send_pos():
+    my_pos = f"{PLAYER_RELATIVE_POSITION[0]},{PLAYER_RELATIVE_POSITION[1]},{PLAYER_RELATIVE_POSITION[2]}"
     l = pickle.dumps(f"adp{my_pos}")
     server_s.sendall(l)
     testdata = pickle.loads(server_s.recv(4096))
     testdatatuple = tuple(map(float, testdata.split(",")))
-    print(testdatatuple,x[0])
-    if testdatatuple[0] == x[0]:
-        pass
+    if testdatatuple[0] == PLAYER_RELATIVE_POSITION[0]:
+        print("sent correct")
     else:
         sys.exit()
 
@@ -186,6 +182,7 @@ print("sorted reaady")
 counter = 0     
 
 while True:
+    send_pos()
     if my_sprites != my_shop1_sprites:
         if p.get_colliding_with(my_sprites["shop1"]):
             if my_sprites["shop1"].get_point_collide(pygame.mouse.get_pos()):
@@ -227,6 +224,7 @@ while True:
     clock.tick(30)
     if pressed != False:
         if pressed == "up":
+            PLAYER_RELATIVE_POSITION[1] -= 0.7
             for key in printing_row:
                 if not key == "p":
                     my_sprites[key].change_position(0,0.7)
@@ -236,10 +234,12 @@ while True:
                 my_sprites["p"].change_position(0,1.4)
             else:
                 my_sprites["p"].z_position += 0.7
+                PLAYER_RELATIVE_POSITION[2] += 0.7
             del printing_row[printing_row.index("p")]
             make_row("p")
 
         if pressed == "down":
+            PLAYER_RELATIVE_POSITION[1] += 0.7
             for key in printing_row:
                 if not key == "p":
                     my_sprites[key].change_position(0,-0.7)
@@ -248,11 +248,14 @@ while True:
             if out_of_charakter == True:
                 my_sprites["p"].change_position(0,-1.4)
             else:
+                #do here player and seconf player adjustements
                 my_sprites["p"].z_position -= 0.7
+                PLAYER_RELATIVE_POSITION[2] -= 0.7
             del printing_row[printing_row.index("p")]
             make_row("p")
 
         if pressed == "right":
+            PLAYER_RELATIVE_POSITION[0] += 0.7
             for key in printing_row:
                 if not key == "p":
                     my_sprites[key].change_position(-0.7,0)
@@ -262,6 +265,7 @@ while True:
                 my_sprites["p"].change_position(-1.4,0)
 
         if pressed == "left":
+            PLAYER_RELATIVE_POSITION[0] -= 0.7
             for key in printing_row:
                 if not key == "p":
                     my_sprites[key].change_position(0.7,0)
@@ -287,7 +291,6 @@ while True:
                 my_walk = walk_right
                 pressed = "right"
             elif event.key == pygame.K_SPACE:
-                print(send_pos(my_sprites["p"]))
                 if out_of_charakter == True:
                     out_of_charakter = False
                 else:

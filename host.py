@@ -17,10 +17,8 @@ while True:
     elif b"adp" in data:
         encoded_string = pickle.loads(data)
         encoded_list = list(encoded_string)
-        print(encoded_list)
         encoded_string = ""
-        for i in range(3,len(encoded_list)-1):
+        for i in range(3,len(encoded_list)):
             encoded_string += str(encoded_list[i])
-        print(encoded_string)
         players_connected[f"{addr}"] = encoded_string
         s.sendto(pickle.dumps(encoded_string),addr)
