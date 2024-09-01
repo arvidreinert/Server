@@ -13,8 +13,7 @@ while True:
         for address in players_connected:
             if address != addr:
                 break
-        pickle.dumps(players_connected)
-        #s.sendto(players_connected, addr)
+        s.sendto(pickle.dumps(players_connected[address]), addr)
 
     elif b"adp" in data:
         encoded_string = pickle.loads(data)
