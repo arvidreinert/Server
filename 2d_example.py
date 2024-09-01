@@ -15,7 +15,7 @@ def send_pos():
     testdata = pickle.loads(server_s.recv(4096))
     testdatatuple = tuple(map(float, testdata.split(",")))
     if testdatatuple[0] == PLAYER_RELATIVE_POSITION[0]:
-        print("sent correct")
+        pass
     else:
         sys.exit()
 
