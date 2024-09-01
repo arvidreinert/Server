@@ -15,10 +15,10 @@ while True:
                 break
         s.sendto(pickle.dumps(players_connected[address]), addr)
 
-    elif data == b"how many players are online":
+    if b"how many players are online" in data:
         s.sendto(pickle.dumps(len(players_connected)), addr)
 
-    elif b"adp" in data:
+    if b"adp" in data:
         encoded_string = pickle.loads(data)
         encoded_list = list(encoded_string)
         encoded_string = ""

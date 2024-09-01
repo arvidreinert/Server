@@ -208,7 +208,8 @@ while True:
 
     if MORE_THAN_ONE_PLAYER:
         p_test_position = get_others_players_pos()
-        p2.set_position(p_test_position[0],p_test_position[1],p_test_position[2])
+        p2.set_position(p_test_position[0],p_test_position[1])
+        p2.z_position = p_test_position[2]
 
     if my_sprites != my_shop1_sprites:
         if p.get_colliding_with(my_sprites["shop1"]):
