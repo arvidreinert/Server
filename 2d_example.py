@@ -8,6 +8,11 @@ PLAYER_RELATIVE_POSITION = [width/2,height/2,0]
 server_s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_s.connect((HOST, PORT))
 #the rectangles position in the middle
+def get_player_count():
+    server_s.sendall(pickle.dumps("how many players are online"))
+    testdata = pickle.loads(server_s.recv(4096))
+    return int(testdata)
+
 def send_pos():
     my_pos = f"{PLAYER_RELATIVE_POSITION[0]},{PLAYER_RELATIVE_POSITION[1]},{PLAYER_RELATIVE_POSITION[2]}"
     l = pickle.dumps(f"adp{my_pos}")
@@ -21,9 +26,13 @@ def send_pos():
 
 def get_others_players_pos():
     server_s.sendall(b"get_me_the_others_location")
-    data = server_s.recv(1024)
-    data = pickle.loads(data)
-    return data
+    testdata = pickle.loads(server_s.recv(4096))
+    testdatatuple = list(map(float, testdata.split(",")))
+    print(testdatatuple)
+    if testdatatuple[0] != False:
+        return testdatatuple
+    else:
+        sys.exit()
 
 def statue(location=(0,height/2,0)):
     v = location[2]+10
@@ -132,6 +141,14 @@ p = Rectangle((width/5,height/15),(width/2,height/2),(250,0,0),"Basic Charakter 
 p.set_image(walk_front[1],True)
 p.set_size((100,100))
 p.z_position = 0
+
+#second player
+p2 = Rectangle((width/5,height/15),(width/2,height/2),(250,0,0),"Basic Charakter Spritesheet.png")
+p2.set_image(walk_front[1],True)
+p2.set_size((100,100))
+p2.z_position = 0
+p2.kill()
+
 my_sprites = {}
 living_house = mini_house((width/2-200,height/2,85))
 tanne = tree((width/2-100,height/2,40))
@@ -149,8 +166,9 @@ my_sprites["turn1"] = street_curve_right_up((width/2-400,height/2,100))
 my_sprites["shop1"] = cosy_shop((width/2+100,height/2,300))
 my_sprites["register"] = register_books((width/2-500,height/2,0))
 my_sprites["p"] = p
+my_sprites["p2"] = p2
 my_out_world_sprites = my_sprites
-my_shop1_sprites = {"p":p}
+my_shop1_sprites = {"p":p,"p2":p2}
 out_of_charakter = False
 my_sprites["turn1"].set_rotation(-90)
 #you have to summand y+(z+z:4)*-1
@@ -180,9 +198,18 @@ for key in my_sprites:
     print(f"loading{key}")
 print("sorted reaady")
 counter = 0     
+MORE_THAN_ONE_PLAYER = False
 
 while True:
     send_pos()
+    if get_player_count() >= 2:
+        MORE_THAN_ONE_PLAYER = True
+        p2.is_updating = True
+
+    if MORE_THAN_ONE_PLAYER:
+        p_test_position = get_others_players_pos()
+        p2.set_position(p_test_position[0],p_test_position[1],p_test_position[2])
+
     if my_sprites != my_shop1_sprites:
         if p.get_colliding_with(my_sprites["shop1"]):
             if my_sprites["shop1"].get_point_collide(pygame.mouse.get_pos()):
@@ -236,7 +263,9 @@ while True:
                 my_sprites["p"].z_position += 0.7
                 PLAYER_RELATIVE_POSITION[2] += 0.7
             del printing_row[printing_row.index("p")]
+            del printing_row[printing_row.index("p2")]
             make_row("p")
+            make_row("p2")
 
         if pressed == "down":
             PLAYER_RELATIVE_POSITION[1] += 0.7
