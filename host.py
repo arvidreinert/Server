@@ -12,11 +12,12 @@ while True:
     if data == b"get_me_the_others_location":
         for address in players_connected:
             if address != addr:
-                break
-        s.sendto(pickle.dumps(players_connected[address]), addr)
+                print(addr, address)
+                s.sendto(pickle.dumps(players_connected[address]), addr)
 
     if b"how many players are online" in data:
-        s.sendto(pickle.dumps(len(players_connected)), addr)
+        n = len(players_connected)
+        s.sendto(pickle.dumps(n), addr)
 
     if b"adp" in data:
         encoded_string = pickle.loads(data)
